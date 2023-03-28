@@ -1,0 +1,31 @@
+def remote = [:]
+remote.name = 'test'
+remote.host = '13.232.80.39' //machine ID
+remote.port = 22
+remote.allowAnyHosts = true
+pipeline {
+    agent any
+     stages {
+        stage('Git Clone') {
+            steps {
+                // Get some code from a GitHub repository
+                git branch: 'main', credentialsId: 'githubcred', url: 'https://github.com/ShaRaf2512/demojen.git'
+            }
+        }
+     stage('Deployment'){
+        steps {
+            script {
+             // move the new changed 
+             
+             withCredentials([usernamePassword(credentialsId: 'sadafjencred', passwordVariable: 'pass', usernameVariable: 'user')]) {
+             remote.user = user
+             remote.password = pass
+             sshPut remote: remote, from: "index.html", into: "/var/www/html"
+             sshCommand remote: remote, command: "ls /var/www/html"
+             
+             }
+           }
+          }
+        }
+      }
+    }
